@@ -22,7 +22,16 @@ def load_dataset(filename: str) -> list[list[float]]:
 
     Note: If you are stuck on this, I recommend looking through the python csv library.
     """
-    raise NotImplementedError()
+    GasProperties = []
+    with open(filename, "r") as file:
+        reader = csv.reader(file)
+        next(reader)
+
+        for row in reader:
+            converted_row = [float(value) for value in row]
+            GasProperties.append(converted_row)
+    return GasProperties
+
 
 @typechecked
 def load_dataset_np(filename: str) -> np.ndarray:
@@ -41,7 +50,13 @@ def load_dataset_np(filename: str) -> np.ndarray:
     
     Note: Numpy has a very useful csv file reader called genfromtxt.
     """
-    raise NotImplementedError()
+    GasProperties = np.genfromtxt(
+        filename,
+        delimiter=",",
+        skip_header=1
+    )
+    return GasProperties
+    #raise NotImplementedError()
 
 @typechecked
 def normalize_array(arr: list[list[float]], out_file: str | None = None) -> int:
@@ -64,6 +79,77 @@ def normalize_array(arr: list[list[float]], out_file: str | None = None) -> int:
     Note: Probably the most complicated function to write because you cant use numpy.
     I would spend some time on this to make sure that all the equations for metrics are correct.
     """
+     #save the metrics for each column in a list
+    means = []
+    minimums = []
+    maximums = []
+    standard_deviations = []
+
+    for column in range(4):
+        values = []
+
+        for row in arr:
+            values.append(row[column])
+        #calculations after getting the values from the column
+        mean = sum(values) / len(values)
+        minimum = min(values)
+        maximum = max(values)
+
+        squared_differences_sum = 0 #each column resets after completing the loop
+        #Calculate the standard deviation
+        for value in values:
+            squared_differences_sum += (value - mean) ** 2
+    
+        variance = squared_differences_sum / len(values)
+        standard_deviation = variance ** 0.5
+        #add the metrics to the lists
+        means.append(mean)
+        minimums.append(minimum)
+        maximums.append(maximum)
+        standard_deviations.append(standard_deviation)
+        print(f"{values} and {mean}")
+
+    #outliers to be filtered out
+    filtered_rows = []
+
+    for row in arr:
+        is_outlier = False
+        for column in range(4):
+            if abs(row[column] - means[column]) > 2 * standard_deviations[column]:
+                is_outlier = True
+                break
+            
+        if not is_outlier:
+            filtered_rows.append(row)
+
+    normalized_rows = []
+
+    for row in filtered_rows:
+        new_row = []
+
+        for column in range(4):
+            denominator = maximums[column] - minimums[column]
+
+            if denominator == 0:
+                normalized_value = 0.0  # or any other value you want to assign in this case
+            else:
+                normalized_value = (row[column] - means[column]) / (maximums[column] - minimums[column])
+
+            new_row.append(normalized_value)
+# Append the target variable without normalization
+
+        new_row.append(row[4])
+
+        normalized_rows.append(new_row)
+
+    if out_file is not None:
+        with open(out_file, "w", newline="") as file:
+            writer = csv.writer(file)
+            writer.writerow(["T", "P", "TC", "SV", "idx"])
+            writer.writerows(normalized_rows)
+
+    return len(normalized_rows)
+    
     raise NotImplementedError()
 
 @typechecked
