@@ -86,28 +86,18 @@ def normalize_array(arr: list[list[float]], out_file: str | None = None) -> int:
     standard_deviations = []
 
     for column in range(4):
-        values = []
-
-        for row in arr:
-            values.append(row[column])
-        #calculations after getting the values from the column
-        mean = sum(values) / len(values)
+        values = [row[column] for row in arr]
+        mean = sum(values)/len(values)
         minimum = min(values)
         maximum = max(values)
 
-        squared_differences_sum = 0 #each column resets after completing the loop
-        #Calculate the standard deviation
-        for value in values:
-            squared_differences_sum += (value - mean) ** 2
-    
+        squared_differences_sum = sum((value - mean) ** 2 for value in values)
         variance = squared_differences_sum / len(values)
         standard_deviation = variance ** 0.5
-        #add the metrics to the lists
         means.append(mean)
         minimums.append(minimum)
         maximums.append(maximum)
         standard_deviations.append(standard_deviation)
-        print(f"{values} and {mean}")
 
     #outliers to be filtered out
     filtered_rows = []
@@ -133,7 +123,7 @@ def normalize_array(arr: list[list[float]], out_file: str | None = None) -> int:
             if denominator == 0:
                 normalized_value = 0.0  # or any other value you want to assign in this case
             else:
-                normalized_value = (row[column] - means[column]) / (maximums[column] - minimums[column])
+                normalized_value = (row[column] - means[column]) / denominator
 
             new_row.append(normalized_value)
 # Append the target variable without normalization
