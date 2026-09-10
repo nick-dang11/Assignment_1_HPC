@@ -91,7 +91,10 @@ def find_largest_dot_product_np(X_data: np.ndarray, Y_data: np.ndarray) -> int:
     Note: This might be a little more tricky to do, the solution itself is pretty short (3 lines) 
     but finding the right function in numpy might be difficult.
     """
-    raise NotImplementedError()
+    dot_products = np.dot(X_data.T, Y_data)
+    largest_index = np.argmax(dot_products)
+    return int(largest_index)
+    #raise NotImplementedError()
 
 @typechecked
 def mat_mul_np(A: np.ndarray, B: np.ndarray) -> np.ndarray:
