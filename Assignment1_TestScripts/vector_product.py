@@ -1,6 +1,8 @@
 import numpy as np
 import torch as t
 from typeguard import typechecked
+import pandas as pd
+import time 
 
 @typechecked
 def dot_product(a: list[float], b: list[float]) -> float:
@@ -91,7 +93,7 @@ def find_largest_dot_product_np(X_data: np.ndarray, Y_data: np.ndarray) -> int:
     Note: This might be a little more tricky to do, the solution itself is pretty short (3 lines) 
     but finding the right function in numpy might be difficult.
     """
-    dot_products = np.dot(X_data.T, Y_data)
+    dot_products = X_data @ Y_data
     largest_index = np.argmax(dot_products)
     return int(largest_index)
     #raise NotImplementedError()
@@ -113,8 +115,8 @@ def mat_mul_np(A: np.ndarray, B: np.ndarray) -> np.ndarray:
     
     Note: This is a 1-line solution, if you spend more than 10 mins on this, you may be overthinking.
     """
-    result = A @ B
-    print(result)
+    return A @ B
+    
 
 @typechecked
 def mat_mul_t(A: t.Tensor, B: t.Tensor) -> t.Tensor:
@@ -133,8 +135,7 @@ def mat_mul_t(A: t.Tensor, B: t.Tensor) -> t.Tensor:
 
     Note: This is a 1-line solution, if you spend more than 10 mins on this, you may be overthinking.
     """
-    result = A @ B
-    print(result)
+    return A @ B
 
 @typechecked
 def dot_product_t(a: t.Tensor, b: t.Tensor) -> t.tensor:
@@ -153,4 +154,22 @@ def dot_product_t(a: t.Tensor, b: t.Tensor) -> t.tensor:
     
     Note: This is a 1-line solution, if you spend more than 10 mins on this, you may be overthinking.
     """
-    raise NotImplementedError()
+    return t.dot(a,b)
+
+
+
+if __name__ == "__main__":
+    print("Matrix Multiplication Benchmarks")
+
+    df_norm = pd.read_csv("GasProperties_norm.csv")
+    X_np = df_norm[['T', 'P', 'TC', 'SV']].to_numpy()
+    
+    X_32 = X_np.astype(np.float32)
+    X_64 = X_np.astype(np.float64)
+
+    start_time = time.perf_counter()
+    res = mat_mul_np(X_32.T, X_32)
+    end_time = time.perf_counter()
+    
+    print(f"Matrix multiplication completed successfully in {end_time - start_time:.6f} seconds.")
+    print("Result shape:", res.shape)
