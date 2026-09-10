@@ -69,7 +69,8 @@ def dot_product_np(a: np.ndarray, b: np.ndarray) -> float:
 
     Note: This is a 1-line solution, if you spend more than 10 mins on this, you may be overthinking.
     """
-    raise NotImplementedError()
+    return float(np.dot(a, b))
+    #raise NotImplementedError()
 
 @typechecked
 def find_largest_dot_product_np(X_data: np.ndarray, Y_data: np.ndarray) -> int:
