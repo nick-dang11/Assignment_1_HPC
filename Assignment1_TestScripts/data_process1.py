@@ -140,7 +140,7 @@ def normalize_array(arr: list[list[float]], out_file: str | None = None) -> int:
 
     return len(normalized_rows)
     
-    raise NotImplementedError()
+    #raise NotImplementedError()
 
 @typechecked
 def normalize_array_np(arr: np.ndarray, out_file: str | None = None) -> int:
@@ -172,6 +172,19 @@ def normalize_array_np(arr: np.ndarray, out_file: str | None = None) -> int:
 
     outliers = np.abs(features - means) > 2 * standard_deviations
     row_has_outlier = np.any(outliers, axis=1)
-    filtered_rows = arr[~row_has_outlier]
-    raise NotImplementedError()
+    filtered_arr = arr[~row_has_outlier]
+
+    denominator = maximums - minimums
+    denominator[denominator == 0] = 1  # Avoid division by zero
+
+    normalized_features = (filtered_arr[:, :4] - means) / denominator
+
+    idx_column = filtered_arr[:, 4:].reshape(-1, 1)
+    normalized_array = np.hstack((normalized_features, idx_column))
+
+    if out_file is not None:
+        np.savetxt(out_file, normalized_array, delimiter=",", header="T,P,TC,SV,idx", comments='')
+
+    return len(normalized_array)
+    #raise NotImplementedError()
 
