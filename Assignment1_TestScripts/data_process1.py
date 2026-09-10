@@ -163,5 +163,15 @@ def normalize_array_np(arr: np.ndarray, out_file: str | None = None) -> int:
     Note: The same function as normalize_array but using numpy to calculate the metrics.
     This function should be almost copy and paste with numpy functions.
     """
+    features = arr[:, :4] # all rows and first 4 columns 
+
+    means = np.mean(features, axis=0)
+    minimums = np.min(features, axis=0)
+    maximums = np.max(features, axis=0)
+    standard_deviations = np.std(features, axis=0)
+
+    outliers = np.abs(features - means) > 2 * standard_deviations
+    row_has_outlier = np.any(outliers, axis=1)
+    filtered_rows = arr[~row_has_outlier]
     raise NotImplementedError()
 
