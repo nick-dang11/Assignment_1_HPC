@@ -133,7 +133,8 @@ def mat_mul_t(A: t.Tensor, B: t.Tensor) -> t.Tensor:
 
     Note: This is a 1-line solution, if you spend more than 10 mins on this, you may be overthinking.
     """
-    raise NotImplementedError()
+    result = A @ B
+    print(result)
 
 @typechecked
 def dot_product_t(a: t.Tensor, b: t.Tensor) -> t.tensor:
