@@ -159,9 +159,34 @@ def dot_product_t(a: t.Tensor, b: t.Tensor) -> t.tensor:
 
 
 if __name__ == "__main__":
-    print("Matrix Multiplication Benchmarks")
 
     df_norm = pd.read_csv("GasProperties_norm.csv")
+
+    X_data_np = df_norm[['T', 'P', 'TC', 'SV']].to_numpy().T 
+    Y_data_np = df_norm['idx'].to_numpy()
+
+    X_data_list = [
+        df_norm['T'].tolist(), 
+        df_norm['P'].tolist(), 
+        df_norm['TC'].tolist(), 
+        df_norm['SV'].tolist()
+    ]
+    Y_data_list = df_norm['idx'].tolist()
+    
+    start_time = time.perf_counter()
+    best_py_idx = find_largest_dot_product_py(X_data_list, Y_data_list)
+    end_time = time.perf_counter()
+    print(f"Loop-based dot product time: {end_time - start_time:.6f} seconds")
+    print(f"Best column index (Python loop): {best_py_idx}")
+    print("Matrix Multiplication Benchmarks")
+
+    start_time = time.perf_counter()
+    best_np_idx = find_largest_dot_product_np(X_data_np, Y_data_np)
+    end_time = time.perf_counter()
+    print(f"NumPy dot product time: {end_time - start_time:.6f} seconds")
+    print(f"Best column index (NumPy): {best_np_idx}")
+
+    
     X_np = df_norm[['T', 'P', 'TC', 'SV']].to_numpy()
     
     X_32 = X_np.astype(np.float32)
