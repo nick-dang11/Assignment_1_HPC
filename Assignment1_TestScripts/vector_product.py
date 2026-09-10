@@ -110,7 +110,8 @@ def mat_mul_np(A: np.ndarray, B: np.ndarray) -> np.ndarray:
     
     Note: This is a 1-line solution, if you spend more than 10 mins on this, you may be overthinking.
     """
-    raise NotImplementedError()
+    result = A @ B
+    print(result)
 
 @typechecked
 def mat_mul_t(A: t.Tensor, B: t.Tensor) -> t.Tensor:
