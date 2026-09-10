@@ -20,7 +20,8 @@ def dot_product(a: list[float], b: list[float]) -> float:
     Note: You can use standard for-loops or list comprehension if you want to be fancy.
     If you want a challenge, try writing this in 1 line.
     """
-    raise NotImplementedError()
+    return sum(x * y for x, y in zip(a,b))
+    #raise NotImplementedError()
 
 @typechecked
 def find_largest_dot_product_py(X_data: list[list[float]], Y_data: list[float]) -> int:
@@ -41,7 +42,15 @@ def find_largest_dot_product_py(X_data: list[list[float]], Y_data: list[float]) 
     Note: I recommend using the dot_product function you wrote above to complete this.
     The implementation for this function is pretty straightforward.
     """
-    raise NotImplementedError()
+    largest_dot = float('-inf')
+    best_index = -1
+    for i, vector in enumerate(X_data):
+        current_dot = dot_product(vector, Y_data)
+        if current_dot > largest_dot:
+            largest_dot = current_dot
+            best_index = i
+    return best_index
+    #raise NotImplementedError()
 
 @typechecked
 def dot_product_np(a: np.ndarray, b: np.ndarray) -> float:
