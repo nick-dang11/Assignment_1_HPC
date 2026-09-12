@@ -159,42 +159,49 @@ def dot_product_t(a: t.Tensor, b: t.Tensor) -> t.tensor:
 
 
 if __name__ == "__main__":
-
+    import sys
+    vp = sys.modules[__name__]
     df_norm = pd.read_csv("GasProperties_norm.csv")
+    X_data = df_norm[['T', 'P', 'TC', 'SV']].to_numpy()
 
-    X_data_np = df_norm[['T', 'P', 'TC', 'SV']].to_numpy().T 
-    Y_data_np = df_norm['idx'].to_numpy()
+    print("Starting benchmarks...")
 
-    X_data_list = [
-        df_norm['T'].tolist(), 
-        df_norm['P'].tolist(), 
-        df_norm['TC'].tolist(), 
-        df_norm['SV'].tolist()
-    ]
-    Y_data_list = df_norm['idx'].tolist()
-    
-    start_time = time.perf_counter()
-    best_py_idx = find_largest_dot_product_py(X_data_list, Y_data_list)
-    end_time = time.perf_counter()
-    print(f"Loop-based dot product time: {end_time - start_time:.6f} seconds")
-    print(f"Best column index (Python loop): {best_py_idx}")
-    print("Matrix Multiplication Benchmarks")
+    # Create a 4-element query vector matching X_data's 4 feature columns
+    Y_vector = np.array([1.0, 0.5, -0.5, 1.0])
 
-    start_time = time.perf_counter()
-    best_np_idx = find_largest_dot_product_np(X_data_np, Y_data_np)
-    end_time = time.perf_counter()
-    print(f"NumPy dot product time: {end_time - start_time:.6f} seconds")
-    print(f"Best column index (NumPy): {best_np_idx}")
+    # 2(a): Python Loop Dot Product Benchmark
+    start = time.perf_counter()
+    best_py = vp.find_largest_dot_product_py(X_data.tolist(), Y_vector.tolist())
+    time_py = time.perf_counter() - start
+    print(f"Python Loop -> Index: {best_py} | Time: {time_py:.4f} s")
 
-    
-    X_np = df_norm[['T', 'P', 'TC', 'SV']].to_numpy()
-    
-    X_32 = X_np.astype(np.float32)
-    X_64 = X_np.astype(np.float64)
+    # 2(b): NumPy Dot Product Benchmark (Vectorized)
+    start = time.perf_counter()
+    best_np = vp.find_largest_dot_product_np(X_data, Y_vector)
+    time_np = time.perf_counter() - start
 
-    start_time = time.perf_counter()
-    res = mat_mul_np(X_32.T, X_32)
-    end_time = time.perf_counter()
-    
-    print(f"Matrix multiplication completed successfully in {end_time - start_time:.6f} seconds.")
-    print("Result shape:", res.shape)
+    np_dot_values = X_data @ Y_vector
+    max_val_np = np_dot_values[best_np]
+    print(f"NumPy Vectorized -> Index: {best_np} | Max Dot Product: {max_val_np:.4f} | Time: {time_np:.4f} s")
+
+    # 2(c): Matrix Multiplication Precision (32-bit vs 64-bit)
+    X_32 = X_data.astype(np.float32)
+    X_64 = X_data.astype(np.float64)
+
+    start = time.perf_counter()
+    res_32 = vp.mat_mul_np(X_32.T, X_32)
+    print(f"NumPy 32-bit MatMul Time: {time.perf_counter() - start:.4f} s")
+
+    start = time.perf_counter()
+    res_64 = vp.mat_mul_np(X_64.T, X_64)
+    print(f"NumPy 64-bit MatMul Time: {time.perf_counter() - start:.4f} s")
+
+    # 2(d): PyTorch GPU Acceleration (64-bit)
+    A_gpu = t.tensor(X_64, dtype=t.float64, device='cuda')
+    t.cuda.synchronize()
+    start = time.perf_counter()
+    res_gpu = vp.mat_mul_t(A_gpu.T, A_gpu)
+    t.cuda.synchronize()
+    print(f"PyTorch GPU 64-bit MatMul Time: {time.perf_counter() - start:.4f} s")
+
+

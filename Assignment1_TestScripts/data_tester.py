@@ -7,9 +7,14 @@ import time
 
 if __name__ == "__main__":
     # Python approach
-    print("Python Array Normalization")
-    raw_data_list = load_dataset("GasProperties.csv")
+    print("Python Array Loading and Normalization")
     
+    start_time_load = time.perf_counter()
+    raw_data_list = load_dataset("GasProperties.csv")
+    end_time_load = time.perf_counter()
+    time_py_load = end_time_load - start_time_load
+    print(f"Loading time (Python lists): {time_py_load:.4f} seconds")
+
     start_time = time.perf_counter()
     rows_py = normalize_array(raw_data_list, out_file="GasProperties_norm.csv")
     end_time = time.perf_counter()
@@ -19,9 +24,14 @@ if __name__ == "__main__":
     print(f"Computation time (Python lists): {time_py:.4f} seconds")
 
     # NumPy approach
-    print("\nNumPy Array Normalization")
-    raw_data_np = load_dataset_np("GasProperties.csv")
+    print("\nNumPy Array Loading and Normalization")
     
+    start_time_load = time.perf_counter()
+    raw_data_np = load_dataset_np("GasProperties.csv")
+    end_time_load = time.perf_counter()
+    time_np_load = end_time_load - start_time_load
+    print(f"Loading time (NumPy): {time_np_load:.4f} seconds")
+
     start_time = time.perf_counter()
     rows_np = normalize_array_np(raw_data_np, out_file="GasProperties_norm_np.csv")
     end_time = time.perf_counter()
@@ -29,4 +39,3 @@ if __name__ == "__main__":
     time_np = end_time - start_time
     print(f"Rows processed: {rows_np}")
     print(f"Computation time (NumPy): {time_np:.4f} seconds")
-    
